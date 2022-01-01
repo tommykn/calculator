@@ -16,8 +16,102 @@ const clearButton = document.querySelector('.clear-button');
 const deleteButton = document.querySelector('.delete-button');
 
 
+window.addEventListener('keydown', (e) => {
+    let numArray = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.'];
+    let operArray = ['+', '-', '/', '*'];
+
+    if (e.key === '.' && getIsPointPressed() === true) {
+        return;
+    }
+
+    for (let i = 0; i < numArray.length; i++) {
+        if (numArray[i] === e.key) {
+            if (isEqualPressed === true) {
+                display.textContent = e.key;
+                secDisplay.textContent = '';
+                firstValue = '';
+                secondValue = '';
+                operator = '';
+                value = '';
+                isEqualPressed = false;
+                isOperatorPressed = false;
+            } else if (isOperatorPressed === true) {
+                display.textContent = e.key;
+                isOperatorPressed = false;
+            } else {
+                display.textContent += e.key; 
+                isOperatorPressed = false;
+            }
+            return;
+        }
+    }
+    for (let i = 0; i < operArray.length; i++) {
+        if (operArray[i] === e.key) {
+            if (isOperatorPressed === true) {
+                return;
+            }
+            if (firstValue !== '' && operator === '/' && display.textContent === '0') {
+                divideZero();
+                return;
+            }
+            if (firstValue !== '') {
+                if (display.textContent === '') {
+                    firstValue = '';
+                    secondValue = '';
+                    operator = '';
+                    value = '';
+                }
+                secondValue = display.textContent;
+                secDisplay.textContent = firstValue + ' ' + operator + ' ' + secondValue;
+                value = operate(operator, firstValue, secondValue);
+                display.textContent = value;
+            }
+            firstValue = display.textContent;
+            operator = e.key;
+            isOperatorPressed = true;
+            secDisplay.textContent = firstValue + ' ' + operator;
+            isEqualPressed = false;
+            return;
+        }
+    }
+    if (e.key === '=' || e.key === 'Enter') {
+        if (isOperatorPressed === true) {
+            return;
+        }
+        if (firstValue === '') {
+            return;
+        }
+        secondValue = display.textContent;
+        if (secondValue === '0' && operator === '/') {
+            divideZero();
+            return;
+        }
+        secDisplay.textContent = firstValue + ' ' + operator + ' ' + secondValue;
+        value = operate(operator, firstValue, secondValue);
+        display.textContent = value;
+        firstValue = '';
+        isEqualPressed = true;
+        isOperatorPressed = false;
+        return;
+    }
+    if (e.key === 'Backspace') {
+        backspace();
+        return;
+    }
+    if (e.key == 'Escape') {
+        clear();
+        return;
+    }
+
+
+})
+
+
 numButtons.forEach(button => {
     button.addEventListener('click', (e) => {
+        if (e.target.textContent === '.' && getIsPointPressed() === true) {
+            return;
+        }
         if (isEqualPressed === true) {
             display.textContent = e.target.textContent;
             secDisplay.textContent = '';
@@ -41,6 +135,9 @@ numButtons.forEach(button => {
 
 operButtons.forEach(button => {
     button.addEventListener('click', (e) => {
+        if (isOperatorPressed === true) {
+            return;
+        }
         if (firstValue !== '' && operator === '/' && display.textContent === '0') {
             divideZero();
             return;
@@ -68,6 +165,12 @@ operButtons.forEach(button => {
 });
 
 equalButton.addEventListener('click', () => {
+    if (isOperatorPressed === true) {
+        return;
+    }
+    if (firstValue === '') {
+        return;
+    }
     secondValue = display.textContent;
     if (secondValue === '0' && operator === '/') {
         divideZero();
@@ -120,6 +223,25 @@ function backspace() {
 
 
 
+function getIsPointPressed() {
+    let str = display.textContent;
+    let array = str.split('');
+    let isPointPressed = false;
+
+    for (let i = 0; i < array.length; i++) {
+        if (array[i] === '.') {
+            isPointPressed = true;
+            break;
+        } else {
+            isPointPressed = false;
+        }
+    }
+
+    return isPointPressed;
+}
+
+
+
 
 
 function clear() {
@@ -147,15 +269,18 @@ function divideZero() {
 
 
 function add(a, b) {
-    return +a + +b;
+    let x = a + b;
+    return Math.round(1000 * x) / 1000;
 }
 
 function subtract(a, b) {
-    return a - b;
+    let x = a - b;
+    return Math.round(1000 * x) / 1000;
 }
 
 function multiply(a ,b) {
-    return a * b;
+    let x = a * b;
+    return Math.round(1000 * x) / 1000;
 }
 
 function divide(a, b) {
@@ -164,16 +289,18 @@ function divide(a, b) {
 
 
 function operate(operator, a, b) {
+    let x = Number(a);
+    let y = Number(b);
     if (operator === '+') {
-        return add(a, b);
+        return add(x, y);
     } else if (operator === '-') {
-        return subtract(a, b);
+        return subtract(x, y);
     } else if (operator === '*') {
-        return multiply(a, b);
+        return multiply(x, y);
     // } else if (operator === '/' && b === '0') {
     //     divideZero();
     } else if (operator === '/') {
-        return divide(a, b);
+        return divide(x, y);
     } else {
         return null;
     }
