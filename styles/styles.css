@@ -31,6 +31,7 @@ body {
     background-color: lightgray;
     border-radius: 1rem;
     padding-top: .75rem;
+    padding-bottom: .75rem;
 }
 
 .top-wrapper {
@@ -40,6 +41,7 @@ body {
     margin-top: 1rem;
     background-color: white;
     border-radius: .5rem;
+    flex: auto;
 }
 
 .buttons-wrapper {
